@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  readmefetcher:
+    build: .
+    env_file: .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - repos_data:/data/repos
+      - ./secrets/readmefetcher.2025-12-09.private-key.pem:/run/secrets/readmefetcher.2025-12-09.private-key.pem:ro
+    restart: unless-stopped
+
+volumes:
+  repos_data:
