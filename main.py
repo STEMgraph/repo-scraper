@@ -2,29 +2,16 @@ import os, time, json, base64
 from fastapi import FastAPI, BackgroundTasks
 import jwt, requests
 
-APP_ID = int(os.environ['GITHUB_APP_ID'])
-INSTALLATION_ID = os.environ['GITHUB_INSTALLATION_ID']
-PRIVATE_KEY_PATH = os.environ['GITHUB_APP_PEM']
 ORG = os.environ['GITHUB_ORG']
+PAT_FILE = os.environ['GITHUB_PAT_FILE']
 STORAGE_DIR = os.environ.get('STORAGE_DIR', '/data/repos')
 METADATA_FILE = os.path.join(STORAGE_DIR, 'metadata.json')
 
 app = FastAPI()
 
-def load_private_key():
-    with open(PRIVATE_KEY_PATH, 'r') as f:
-        return f.read()
-
-def make_jwt():
-    now = int(time.time())
-    payload = {'iat': now - 60, 'exp': now + (9*60), 'iss': APP_ID}
-    return jwt.encode(payload, load_private_key(), algorithm='RS256')
-
-def get_installation_token(jwt_token):
-    url = f'https://api.github.com/app/installations/{INSTALLATION_ID}/access_tokens'
-    headers = {'Authorization': f'Bearer {jwt_token}', 'Accept': 'application/vnd.github+json'}
-    r = requests.post(url, headers=headers); r.raise_for_status()
-    return r.json()['token']
+def get_pat():
+    with open(PAT_FILE, 'r') as f:
+        return f.read().strip()
 
 def list_org_repos(token):
     url = f'https://api.github.com/orgs/{ORG}/repos?per_page=100'
@@ -63,8 +50,7 @@ def save_metadata(m):
         json.dump(m, f)
 
 def refresh_challenge_db_task():
-    jwt_token = make_jwt()
-    token = get_installation_token(jwt_token)
+    token = get_pat()
     repos = list_org_repos(token)
     meta = ensure_metadata()
     for r in repos:
