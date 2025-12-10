@@ -1,6 +1,6 @@
 import os, time, json, base64
 from fastapi import FastAPI, BackgroundTasks
-import jwt, requests
+import requests
 
 ORG = os.environ['GITHUB_ORG']
 PAT_FILE = os.environ['GITHUB_PAT_FILE']
@@ -15,7 +15,7 @@ def get_pat():
 
 def list_org_repos(token):
     url = f'https://api.github.com/orgs/{ORG}/repos?per_page=100'
-    headers = {'Authorization': f'token {token}'}
+    headers = {'Authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
     repos = []
     while url:
         r = requests.get(url, headers=headers); r.raise_for_status()
@@ -25,7 +25,7 @@ def list_org_repos(token):
 
 def latest_commit_sha(token, owner, repo, branch):
     url = f'https://api.github.com/repos/{owner}/{repo}/commits/{branch}'
-    headers = {'Authorization': f'token {token}'}
+    headers = {'Authorization': f'token {token}', 'Accept': 'application/vnd.github.v3+json'}
     r = requests.get(url, headers=headers); r.raise_for_status()
     return r.json()['sha']
 
@@ -42,7 +42,8 @@ def fetch_readme(token, owner, repo):
 def ensure_metadata():
     os.makedirs(STORAGE_DIR, exist_ok=True)
     if os.path.exists(METADATA_FILE):
-        return json.load(open(METADATA_FILE))
+        with open(METADATA_FILE) as f:
+            return json.load(f)
     return {}
 
 def save_metadata(m):
