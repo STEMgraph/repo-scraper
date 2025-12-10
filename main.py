@@ -50,7 +50,7 @@ def save_metadata(m):
     with open(METADATA_FILE, 'w') as f:
         json.dump(m, f)
 
-def refresh_challenge_db_task():
+def sync_readme_task():
     token = get_pat()
     repos = list_org_repos(token)
     meta = ensure_metadata()
@@ -68,7 +68,7 @@ def refresh_challenge_db_task():
                 meta[name] = {'sha': sha, 'downloaded_at': int(time.time()), 'path': filename}
     save_metadata(meta)
 
-@app.post("/refresh_challenge_db")
-async def refresh_challenge_db(background_tasks: BackgroundTasks):
-    background_tasks.add_task(refresh_challenge_db_task)
-    return {"status": "refresh challenge db started"}
+@app.post("/sync_readme")
+async def sync_readme(background_tasks: BackgroundTasks):
+    background_tasks.add_task(sync_readme_task)
+    return {"status": f"synchronizing README.md files from {ORG} started"}

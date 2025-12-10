@@ -1,6 +1,6 @@
 # Repo-Scraper
 
-A prototype solution to skim through all public repositories of an organization and get all updated `README.md`s.
+A prototype solution to skim through all public repositories of an organization and get all updated `README.md` files.
 
 ## Setup
 
