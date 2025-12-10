@@ -1,6 +1,4 @@
-GITHUB_APP_ID=
-GITHUB_INSTALLATION_ID=
 GITHUB_ORG=
-GITHUB_APP_PEM=/run/secrets/readmefetcher.private-key.pem
+GITHUB_PAT_FILE=/run/secrets/github_pat
 STORAGE_DIR=/data/repos
 PORT=8080
